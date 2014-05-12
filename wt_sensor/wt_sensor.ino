@@ -2,6 +2,8 @@
 /************
 TODO - 
 
+INPUT_PULLUP & LOW all test & unused pins
+
 ************/
 
  /*
@@ -14,8 +16,9 @@ NRF24DataRate1Mbps 	1 Mbps
 NRF24DataRate2Mbps 	2 Mbps
 NRF24DataRate250kbps 	250 kbps 
 */
+#include "Energia.h"
 
-#include <DS18B20.h>
+#include "DS18B20.h"
 #include <NRF24.h>
 #include <SPI.h>
 
@@ -29,11 +32,22 @@ struct wt_msg {
 #define WS_DELAY 1000
 
 // pins
-//#define WS_OWPIN    P2_3
-#define WS_OWPIN    P1_3 // use instead of P2_3
+#define WS_OWPIN    P1_3 
 #define WS_ID1      P2_4
 #define WS_ID2      P2_5
 #define WS_TEST     P2_2
+#define WS_CE       P1_4 
+#define WS_SS       P2_0
+#define WS_MISO     P1_7 // 2552
+#define WS_MOSI     P1_6
+#define WS_SCK     P1_5
+
+/* 
+unused
+P1_1, 1_2, 2_1, 2_3
+test & init
+2_4, 2_5, 2_2
+*/
 
 #define WS_CHAN  1
 #define WS_MSG_TEMP  0xFE
@@ -59,6 +73,8 @@ static uint8_t err=0;
 //static uint8_t blinks=0;
 static uint8_t testmode=0;
 static uint16_t sdelay=0;
+
+#define RLS_PIN(P) {digitalWrite(P, LOW); pinMode(P, INPUT_PULLUP); }
 
 /* ID matrix
 
@@ -127,14 +143,20 @@ void setup()
     }
   }
   
-  delay(1000);  
-  lpm_init(testmode); //
-  //lpm_init(true);
+  //RLS_PIN(P1_0); 
+  RLS_PIN(P1_1); RLS_PIN(P1_2); 
+  RLS_PIN(P2_1); RLS_PIN(P2_2); RLS_PIN(P2_3); RLS_PIN(P2_4); RLS_PIN(P2_5);
+  
+  RLS_PIN(P1_3); 
+  
+  //delay(1000);  
+  lpm_init(testmode); 
+  lpm_delay(1); //
 }
 
 void loop()
 {
-  uint8_t nret=4;
+  uint8_t nret=3;
   do {
       term.GetData16_1();
       //lpm_delay(1);
@@ -142,18 +164,13 @@ void loop()
       msg.temp=term.GetData16_2();
   } while(DS18_MEAS_FAIL==msg.temp && --nret>0);
   
+  RLS_PIN(P1_3);
+  
   if(DS18_MEAS_FAIL!=msg.temp) msg.temp=(msg.temp*5)/8;
-  // do retries here?
   
   msg.vcc=getVcc();
   
-  /*
-  if(DS18_MEAS_FAIL==msg.temp)
-    err=2;   
-  else 
-  */
-  
-  nret=4;
+  nret=3;
   do {
     if (!nrf24.setTransmitAddress((uint8_t*)dst_addr, strlen(dst_addr))) 
       err=3;
@@ -185,7 +202,6 @@ void loop()
   }  
   
  lpm_delay(sdelay);
- //delay(5000); 
 }
 
 // LPM SECTION

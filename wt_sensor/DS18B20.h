@@ -34,6 +34,7 @@ class DS18B20
 	int16_t GetData16_1();
 	int16_t GetData16_2();
 	int reset();
+        void release();
 };
 
 #endif

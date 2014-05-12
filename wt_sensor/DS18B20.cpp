@@ -96,6 +96,12 @@ uint16_t DS18B20::ReadDS1820 ( void )
   }
   return byte;
 }
+
+void DS18B20::release(void)
+{
+  OW_RLS
+}
+
 int DS18B20::reset(void)
 {
 	OW_LO
