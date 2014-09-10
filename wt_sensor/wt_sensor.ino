@@ -70,7 +70,6 @@ const char *dst_addr="wserv";
 static wt_msg msg = {WS_MSG_TEMP, 1, 0, 0};
 
 static uint8_t err=0;
-//static uint8_t blinks=0;
 static uint8_t testmode=0;
 static uint16_t sdelay=0;
 
@@ -137,9 +136,11 @@ void setup()
   else {
     for(uint8_t i=0; i<err; i++) {
       digitalWrite(RED_LED, HIGH);
-      delay(200);
+      //delay(200);
+      sleep(200);
       digitalWrite(RED_LED, LOW);
-      delay(200);
+      //delay(200);
+      sleep(200);
     }
   }
   
@@ -148,10 +149,13 @@ void setup()
   RLS_PIN(P2_1); RLS_PIN(P2_2); RLS_PIN(P2_3); RLS_PIN(P2_4); RLS_PIN(P2_5);
   
   RLS_PIN(P1_3); 
-  
-  //delay(1000);  
+
+/*  
   lpm_init(testmode); 
   lpm_delay(1); //
+  */
+  
+  sleepSeconds(1);
 }
 
 void loop()
@@ -160,7 +164,8 @@ void loop()
   do {
       term.GetData16_1();
       //lpm_delay(1);
-      delay(94); // 9-bit conversion
+      //delay(94); // 9-bit conversion
+      sleep(94);
       msg.temp=term.GetData16_2();
   } while(DS18_MEAS_FAIL==msg.temp && --nret>0);
   
@@ -188,22 +193,44 @@ void loop()
     digitalWrite(RED_LED, LOW);
     for(uint8_t i=0; i<err; i++) {
       digitalWrite(RED_LED, HIGH);
-      delay(200);
+      //delay(200);
+      sleep(200);
       digitalWrite(RED_LED, LOW);
-      delay(200);
+      //delay(200);
+      sleep(200);
     }
   }
   else {
     if(testmode) {
       digitalWrite(RED_LED, HIGH);
-      lpm_delay(1);
+      //lpm_delay(1);
+      sleepSeconds(1);
       digitalWrite(RED_LED, LOW);
     }
   }  
   
- lpm_delay(sdelay);
+ //lpm_delay(sdelay);
+ sleepSeconds(sdelay);
 }
 
+
+// returns VCC in .01 volts
+int16_t getVcc() {
+  // start with the 1.5V internal reference
+  analogReference(INTERNAL1V5);
+  int data = analogRead(11);
+  // if overflow, VCC is > 3V, switch to the 2.5V reference
+  if (data==0x3ff) {
+    analogReference(INTERNAL2V5); // NOTE!!!! THIS DRAINS POWER!!!  any REF other than DEFAULT !!!
+    data = (int16_t)map(analogRead(11), 0, 1023, 0, 500);
+  } else {
+    data = (int16_t)map(data, 0, 1023, 0, 300);
+  }
+  return data;  
+}
+
+
+/*
 // LPM SECTION
 
 volatile uint32_t lpm_sec=0; 
@@ -236,19 +263,5 @@ __attribute__((interrupt(TIMER0_A0_VECTOR))) void RTC_isr(void)
  lpm_sec+=tm_step;
  _BIC_SR_IRQ(LPM3_bits); //exit at full speed so our main loop runs again.
 }
-
-// returns VCC in .01 volts
-int16_t getVcc() {
-  // start with the 1.5V internal reference
-  analogReference(INTERNAL1V5);
-  int data = analogRead(11);
-  // if overflow, VCC is > 3V, switch to the 2.5V reference
-  if (data==0x3ff) {
-    analogReference(INTERNAL2V5);
-    data = (int16_t)map(analogRead(11), 0, 1023, 0, 500);
-  } else {
-    data = (int16_t)map(data, 0, 1023, 0, 300);
-  }
-  return data;  
-}
+*/
 
