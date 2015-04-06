@@ -19,7 +19,7 @@ NRF24DataRate250kbps 	250 kbps
 #include "Energia.h"
 
 #include "DS18B20.h"
-#include <NRF24.h>
+#include "NRF24.h"
 #include <SPI.h>
 
 struct wt_msg {
