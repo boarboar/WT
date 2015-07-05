@@ -54,7 +54,10 @@ test & init
 #define WS_IS_NOACK false
 
 #define WS_DELAY_TEST  5
-#define WS_DELAY_NORM  300 // 5 min
+//#define WS_DELAY_NORM  300 // 5 min
+#define WS_DELAY_NORM  900 // 15 min
+
+
 
 // Singleton instance of the radio
 // CE=P1_4
@@ -95,8 +98,8 @@ void setup()
   pinMode(WS_ID2, INPUT_PULLUP);
   pinMode(WS_TEST, INPUT_PULLUP);
     
-  analogReference(INTERNAL2V5);
-  analogRead(11);
+  //analogReference(INTERNAL2V5);
+  //analogRead(11);
   
   for(uint8_t i=0; i<10; i++) {
       digitalWrite(RED_LED, HIGH);
@@ -185,6 +188,7 @@ void loop()
       err=5;
     else  
       err=0;
+    if(err) sleepSeconds(1);  
   } while(err && --nret>0);
     
   nrf24.powerDown(); //!!!!! obviously need to make it to go to DEEP SLEEP!
@@ -226,6 +230,7 @@ int16_t getVcc() {
   } else {
     data = (int16_t)map(data, 0, 1023, 0, 300);
   }
+  analogReference(DEFAULT);
   return data;  
 }
 
