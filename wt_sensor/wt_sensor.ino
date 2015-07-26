@@ -56,7 +56,7 @@ test & init
 #define WS_DELAY_TEST  5
 //#define WS_DELAY_NORM  300 // 5 min
 #define WS_DELAY_NORM  900 // 15 min
-
+#define VCC_CNT_N      4 // every hour; 
 
 
 // Singleton instance of the radio
@@ -75,6 +75,8 @@ static wt_msg msg = {WS_MSG_TEMP, 1, 0, 0};
 static uint8_t err=0;
 static uint8_t testmode=0;
 static uint16_t sdelay=0;
+static int16_t vcc=0;
+static uint8_t vcc_cnt=0;
 
 #define RLS_PIN(P) {digitalWrite(P, LOW); pinMode(P, INPUT_PULLUP); }
 
@@ -176,7 +178,11 @@ void loop()
   
   if(DS18_MEAS_FAIL!=msg.temp) msg.temp=(msg.temp*5)/8;
   
-  msg.vcc=getVcc();
+  if(!vcc_cnt) vcc=getVcc();  
+  if(++vcc_cnt==VCC_CNT_N) vcc_cnt=0;
+  
+  //msg.vcc=getVcc();
+  msg.vcc=vcc;
   
   nret=3;
   do {
