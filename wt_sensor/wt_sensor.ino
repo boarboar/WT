@@ -103,7 +103,7 @@ void setup()
   //analogReference(INTERNAL2V5);
   //analogRead(11);
   
-  for(uint8_t i=0; i<10; i++) {
+  for(uint8_t i=0; i<5; i++) {
       digitalWrite(RED_LED, HIGH);
       delay(100);
       digitalWrite(RED_LED, LOW);
@@ -114,6 +114,7 @@ void setup()
   sdelay=testmode ? WS_DELAY_TEST : WS_DELAY_NORM;
   msg.sid=1+(digitalRead(WS_ID2)==HIGH?0:1)+(digitalRead(WS_ID1)==HIGH?0:1)*2;
  
+  delay(500);
   for(uint8_t i=0; i<msg.sid; i++) {
       digitalWrite(RED_LED, HIGH);
       delay(500);
@@ -141,11 +142,9 @@ void setup()
   else {
     for(uint8_t i=0; i<err; i++) {
       digitalWrite(RED_LED, HIGH);
-      //delay(200);
-      sleep(200);
+      delay(200);
       digitalWrite(RED_LED, LOW);
-      //delay(200);
-      sleep(200);
+      delay(200);
     }
   }
   
