@@ -122,6 +122,9 @@ void setup()
       delay(500);
     }
     
+  uint8_t power=NRF24::NRF24TransmitPower0dBm;
+  if(msg.sid>1) power=NRF24::NRF24TransmitPowerm6dBm; // for remote locations
+  
   if (!nrf24.init())
     err=3;
   else if (!nrf24.setChannel(WS_CHAN))
@@ -132,9 +135,10 @@ void setup()
     err=6;
   //else if (!nrf24.setRF(NRF24::NRF24DataRate2Mbps, NRF24::NRF24TransmitPower0dBm))
   //else if (!nrf24.setRF(NRF24::NRF24DataRate2Mbps, NRF24::NRF24TransmitPowerm6dBm))
-  else if (!nrf24.setRF(NRF24::NRF24DataRate250kbps, NRF24::NRF24TransmitPower0dBm))
+  else if (!nrf24.setRF(NRF24::NRF24DataRate250kbps, power))
     err=7;    
-  nrf24.setRetry(2);  
+  //nrf24.setRetry(2);
+  nrf24.setRetry(10, 3);  
       
   if(!err) {
     if(WS_IS_NOACK) nrf24.spiWriteRegister(NRF24_REG_1D_FEATURE, NRF24_EN_DYN_ACK);  // NO ACK
